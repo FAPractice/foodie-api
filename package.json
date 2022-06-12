@@ -1,0 +1,14 @@
+{
+  "name": "foodie-api",
+  "version": "1.0.0",
+  "description": "A API that serves food recipes over a RESTful API. Built using node.js and Express.js ",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
