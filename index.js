@@ -1,25 +1,88 @@
-const express = require('express');
+const express = require("express");
+const mongoose = require("mongoose");
+
 const port = 3000;
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.send({
-        categories: ['vegetarain', 'meat', 'fish', 'dessert']
-    })
-})
+mongoose.connect("mongodb://localhost:27017/test");
 
-// TODO: Add recipe to database
-app.get('/add/:a/', (req, res) => {
-    res.send('You Sent:' + req.params.a)
-})
+const recipeSchema = new mongoose.Schema({
+  name: String,
+  ingredients: [String],
+  instructions: [String],
+  category: String,
+});
 
-// TODO: Fetch all recipes from database
+const Recipe = mongoose.model("Recipe", recipeSchema);
 
-// TODO: Fetch Recipe by id
+// Returns all the categories of Recipes.
+app.get("/", (req, res) => {
+  Recipe.distinct("category", (err, categories) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(categories);
+    }
+  });
+});
 
-// TODO: Fetch all recipes by category
+// Returns all the recipes present in database.
+app.get("/recipes", (req, res) => {
+  Recipe.find({}, (err, recipes) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(recipes);
+    }
+  });
+});
+
+// Returns the recipe with the given id.
+app.get("/recipes/:id", (req, res) => {
+  Recipe.findById(req.params.id, (err, recipe) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(recipe);
+    }
+  });
+});
+
+// Adds a new recipe to the database.
+app.post("/add", (req, res) => {
+  const recipe = new Recipe(req.body);
+  recipe.save((err, recipe) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(recipe);
+    }
+  });
+});
+
+// Deletes the recipe with the given id.
+app.delete("/delete/:id", (req, res) => {
+  Recipe.findByIdAndRemove(req.params.id, (err, recipe) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(recipe);
+    }
+  });
+});
+
+// Updates the recipe with the given id.
+app.put("/update/:id", (req, res) => {
+  Recipe.findByIdAndUpdate(req.params.id, req.body, (err, recipe) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(recipe);
+    }
+  });
+});
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
